@@ -131,8 +131,8 @@ def evaluate(model, annoy_index):
         map_super_class_id += curr_acc_superclass_id / len(neighbours)
         map_class_id += same_class_id / len(neighbours)
 
-    acc_super_class_id = acc_super_class_id / len(neighbours)
-    acc_class_id = acc_class_id / len(neighbours)
+    acc_super_class_id = acc_super_class_id / (len(neighbours) * len(X_val))
+    acc_class_id = acc_class_id / (len(neighbours) * len(X_val))
     map_superclass_id = map_super_class_id / len(X_val)
     map_class_id = map_class_id / len(X_val)
 
