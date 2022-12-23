@@ -2,10 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-data_dir = '../../../../Downloads/Stanford_Online_Products/'
-
-
-def get_train_test_df():
+def get_train_test_df(data_dir='../../../../../Downloads/Stanford_Online_Products/'):
     train_df = pd.read_csv(f'{data_dir}Ebay_train.txt', sep=" ", header=None)
     train_df.columns = ["image_id", "class_id", "super_class_id", "path"]
     train_df = train_df.iloc[1:, :]
@@ -17,9 +14,12 @@ def get_train_test_df():
     return train_df, test_df
 
 
-def split_data(df):
-    return train_test_split(df, test_size=0.33, random_state=42, stratify=train_df[['class_id']])
+def split_data(data_dir='../../../../../Downloads/Stanford_Online_Products/'):
+    train_df, _ = get_train_test_df(data_dir)
+    return train_test_split(train_df, test_size=0.33, random_state=42, stratify=train_df[['class_id']])
 
 
-train_df, test_df = get_train_test_df()
-X_train, X_val = split_data(train_df)
+if __name__ == '__main__':
+    train_df, test_df = get_train_test_df()
+    X_train, X_val = split_data()
+    print(len(X_train))

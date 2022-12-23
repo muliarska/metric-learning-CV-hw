@@ -6,11 +6,14 @@ import albumentations as albu
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from processing.data_processing import test_df, X_train, X_val, data_dir
+from processing.data_processing import get_train_test_df, split_data
 
 
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
+data_dir = 'Stanford_Online_Products/'
+_, test_df = get_train_test_df(data_dir)
+X_train, X_val = split_data(data_dir)
 
 # Data augmentation
 augmenter = albu.Compose([
@@ -27,9 +30,8 @@ augmenter = albu.Compose([
 ])
 
 
-def load_img_from_path(relative_path):
-    # print(data_dir + relative_path)
-    img = cv2.imread(data_dir + relative_path)
+def load_img_from_path(path):
+    img = cv2.imread(path)
     # (250, 250) image size
     img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_NEAREST)
 
@@ -66,6 +68,7 @@ def build_index(model, title):
 
 
 def visualize_retrieval(model, annoy_index, title):
+    plt.rcParams['figure.figsize'] = [20, 10]
     rows, cols = 5, 5
     f, axarr = plt.subplots(rows, cols)
 
@@ -82,7 +85,7 @@ def visualize_retrieval(model, annoy_index, title):
 
         # get retrieval images
         feature_v = get_vector_for_img(img, model)
-        neightbours = annoy_index.get_nns_by_vector(feature_v, 5)[1:]
+        neightbours = annoy_index.get_nns_by_vector(feature_v, 4)
 
         # plot retrieval images
         for col in range(1, cols):
@@ -90,7 +93,6 @@ def visualize_retrieval(model, annoy_index, title):
             retrieval_img = load_img_from_path(test_df.iloc[neightbours[col-1]]['path'])
             retrieval_super_class_id = test_df.iloc[neightbours[col-1]]['super_class_id']
             axarr[row, col].imshow(np.transpose(retrieval_img, (1, 2, 0)))
-            axarr[row, col].spines['bottom'].set_color('0.5')
             axarr[row, col].set_title(f'Retrieval Super Class: {retrieval_super_class_id}')
 
     plt.subplots_adjust(top=1.4, bottom=0.01)
@@ -109,7 +111,7 @@ def evaluate(model, annoy_index):
 
         # get retrieval images
         feature_v = get_vector_for_img(img, model)
-        neighbours = annoy_index.get_nns_by_vector(feature_v, 6)[1:]  # get top 5 closest
+        neighbours = annoy_index.get_nns_by_vector(feature_v, 5)  # get top 5 closest
 
         curr_acc_class_id = 0
         curr_acc_superclass_id = 0
