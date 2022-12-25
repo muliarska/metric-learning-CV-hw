@@ -1,14 +1,31 @@
 from tqdm import tqdm
 import torch
 import torchvision
-import numpy as np
 from processing.data_processing import split_data
-from processing.utils import load_img_from_path
 from processing.utils import build_index, visualize_retrieval, evaluate
 from pytorch_metric_learning.losses import ArcFaceLoss
+from torch.utils.data import DataLoader
+from processing.dataloader import MyDataset
+import albumentations as albu
 
 
-X_train, _ = split_data()
+# X_train, _ = split_data()
+path = "../../../../Downloads/Stanford_Online_Products/"
+image_size = 250
+augmenter = albu.Compose([
+    albu.HorizontalFlip(),
+    albu.ShiftScaleRotate(shift_limit=0.0, scale_limit=0.1, rotate_limit=10, p=0.4),
+    albu.OneOf(
+        [
+            albu.RandomBrightnessContrast(),
+            albu.RandomGamma(),
+            albu.MedianBlur(),
+        ],
+        p=0.5
+    ),
+])
+
+train_dataloader = DataLoader(MyDataset(path, image_size, "train", albu), batch_size=32, shuffle=True, num_workers=4)
 
 
 # Training function.
@@ -17,10 +34,9 @@ def train_step(model, optimizer, loss_optimizer, device, data_dir):
     model.train()
     train_running_loss = 0.0
     counter = 0
-    for i in tqdm(range(len(X_train))):
-        img = load_img_from_path(data_dir + X_train.iloc[i]['path'])
-        super_class_id = X_train.iloc[i]['super_class_id']
-        labels = torch.from_numpy(np.array([int(el) for el in super_class_id]))
+    for batch in tqdm(train_dataloader):
+        img, _, super_class_id = batch
+        labels = super_class_id
 
         optimizer.zero_grad()
         loss_optimizer.zero_grad()
