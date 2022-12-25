@@ -7,3 +7,4 @@ pandas
 tqdm
 opencv-python
 annoy
+pytorch_metric_learning

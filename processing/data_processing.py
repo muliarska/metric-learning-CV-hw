@@ -22,4 +22,3 @@ def split_data(data_dir='../../../../../Downloads/Stanford_Online_Products/'):
 if __name__ == '__main__':
     train_df, test_df = get_train_test_df()
     X_train, X_val = split_data()
-    print(len(X_train))

@@ -11,7 +11,7 @@ from processing.data_processing import get_train_test_df, split_data
 
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
-data_dir = 'Stanford_Online_Products/'
+data_dir = '../../../../Downloads/Stanford_Online_Products/'
 _, test_df = get_train_test_df(data_dir)
 X_train, X_val = split_data(data_dir)
 
@@ -31,7 +31,7 @@ augmenter = albu.Compose([
 
 
 def load_img_from_path(path):
-    img = cv2.imread(path)
+    img = cv2.imread(data_dir + path)
     # (250, 250) image size
     img = cv2.resize(img, (250, 250), interpolation=cv2.INTER_NEAREST)
 
@@ -96,7 +96,7 @@ def visualize_retrieval(model, annoy_index, title):
             axarr[row, col].set_title(f'Retrieval Super Class: {retrieval_super_class_id}')
 
     plt.subplots_adjust(top=1.4, bottom=0.01)
-    plt.savefig(f'{title}_retrieval.png')
+    plt.savefig(f'../retrieval_plots/{title}_retrieval.png')
 
 
 def evaluate(model, annoy_index):

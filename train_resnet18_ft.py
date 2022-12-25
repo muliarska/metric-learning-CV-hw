@@ -78,6 +78,5 @@ if __name__ == '__main__':
     print("\nSTEP 3: Evaluating")
     evaluate(resnet18_ft, resnet_index)
 
-    print("\nSTEP 4: Performing a retrieval on resnet18")
+    print("\nSTEP 4: Performing a retrieval on resnet18 fine tuned")
     visualize_retrieval(resnet18_ft, resnet_index, title)
-
